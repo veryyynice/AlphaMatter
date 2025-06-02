@@ -9,10 +9,15 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const navItems = [
-    { label: 'About Us', href: '#about' },
-    { label: 'Privacy Policy', href: '#privacy' },
-    { label: 'FAQs', href: '#faqs' }
+    { label: 'About Us', href: '/about' },
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'FAQs', href: '/faqs' }
   ];
+
+  const handleNavigation = (href: string) => {
+    navigate(href);
+    setIsOpen(false);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
@@ -31,13 +36,13 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              <a
+              <button
                 key={item.label}
-                href={item.href}
+                onClick={() => handleNavigation(item.href)}
                 className="text-gray-700 hover:text-[#db4d1a] transition-colors duration-200 font-medium"
               >
                 {item.label}
-              </a>
+              </button>
             ))}
             <Button 
               variant="outline" 
@@ -66,13 +71,13 @@ const Navbar = () => {
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navItems.map((item) => (
-              <a
+              <button
                 key={item.label}
-                href={item.href}
-                className="block px-3 py-2 text-gray-700 hover:text-[#db4d1a] hover:bg-gray-50 rounded-md font-medium"
+                onClick={() => handleNavigation(item.href)}
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-[#db4d1a] hover:bg-gray-50 rounded-md font-medium"
               >
                 {item.label}
-              </a>
+              </button>
             ))}
             <div className="px-3 py-2">
               <Button 

@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MessageCircle, PenTool, TrendingUp, ChevronRight, Users, Brain, Zap } from 'lucide-react';
+import { MessageCircle, PenTool, TrendingUp, ChevronRight, Users, Brain, Zap, Mic, Upload, BarChart3, BookOpen, History, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Navbar from '@/components/Navbar';
@@ -26,6 +25,72 @@ const Index = () => {
       icon: TrendingUp,
       title: "Engage",
       description: "Interactive Q&A, analytics, and AI suggestions that transform passive learning into active participation."
+    }
+  ];
+
+  const studentFeatures = [
+    {
+      icon: Mic,
+      title: "Live Transcription",
+      description: "Real-time speech-to-text conversion with high accuracy across multiple languages."
+    },
+    {
+      icon: MessageCircle,
+      title: "AI Chat Assistant",
+      description: "Ask questions and get instant AI-powered answers about lecture content."
+    },
+    {
+      icon: History,
+      title: "Chat History",
+      description: "Access both general and private chat history across all your courses."
+    },
+    {
+      icon: PenTool,
+      title: "Smart Annotations",
+      description: "Add text notes, drawings, and upload images or PDFs directly to lectures."
+    },
+    {
+      icon: Upload,
+      title: "Media Integration",
+      description: "Seamlessly upload and annotate with images, documents, and multimedia content."
+    },
+    {
+      icon: BookOpen,
+      title: "Course Management",
+      description: "Organize content across multiple courses with intuitive navigation."
+    }
+  ];
+
+  const professorFeatures = [
+    {
+      icon: BarChart3,
+      title: "Analytics Dashboard",
+      description: "Comprehensive insights into student engagement and learning patterns."
+    },
+    {
+      icon: Brain,
+      title: "AI Insights",
+      description: "Get intelligent suggestions for improving lecture delivery and student engagement."
+    },
+    {
+      icon: Upload,
+      title: "Content Upload",
+      description: "Upload lecture notes and materials to enhance AI-powered assistance."
+    },
+    {
+      icon: MessageCircle,
+      title: "Student Interaction",
+      description: "Monitor and respond to student questions and feedback in real-time."
+    },
+    {
+      icon: Users,
+      title: "Class Management",
+      description: "Manage multiple classes and track individual student progress."
+    },
+    {
+      icon: TrendingUp,
+      title: "Performance Tracking",
+      description: "Monitor class performance and identify areas for improvement."
     }
   ];
 
@@ -92,7 +157,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Core Features Section */}
       <section className="py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -117,6 +182,72 @@ const Index = () => {
                     <feature.icon className="h-12 w-12 text-[#db4d1a] mx-auto mb-6" />
                     <h3 className="text-2xl font-semibold text-gray-900 mb-4">{feature.title}</h3>
                     <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Student Features */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Powerful Tools for Students
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Everything you need to excel in your studies, from live transcription to AI-powered assistance.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {studentFeatures.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Card className="h-full hover:shadow-md transition-shadow duration-300">
+                  <CardContent className="p-6">
+                    <feature.icon className="h-8 w-8 text-[#db4d1a] mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Professor Features */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Advanced Analytics for Professors
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Gain deep insights into student engagement and optimize your teaching with AI-powered analytics.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {professorFeatures.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Card className="h-full hover:shadow-md transition-shadow duration-300">
+                  <CardContent className="p-6">
+                    <feature.icon className="h-8 w-8 text-[#db4d1a] mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
                   </CardContent>
                 </Card>
               </motion.div>
