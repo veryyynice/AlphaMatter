@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
@@ -8,9 +7,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Sidebar from '@/components/Sidebar';
 
+interface UploadedFile {
+  id: number;
+  name: string;
+  size: number;
+  uploadTime: string;
+}
+
+interface Prompt {
+  id: number;
+  text: string;
+  category: string;
+  timestamp: string;
+  aiSuggestion?: string;
+}
+
 const ProfessorDashboard = () => {
-  const [selectedPrompt, setSelectedPrompt] = useState(null);
-  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
 
   // Mock data for charts
   const engagementData = [
@@ -28,26 +42,26 @@ const ProfessorDashboard = () => {
     { name: 'Entanglement', value: 20, color: '#ffcc80' }
   ];
 
-  const anonymousPrompts = [
+  const anonymousPrompts: Prompt[] = [
     { id: 1, text: "I'm struggling with the math behind quantum superposition", category: "Academic", timestamp: "2 hours ago" },
     { id: 2, text: "Could we have more practice problems on wave-particle duality?", category: "Request", timestamp: "3 hours ago" },
     { id: 3, text: "The pace feels too fast for understanding complex concepts", category: "Feedback", timestamp: "5 hours ago" },
     { id: 4, text: "More visual demonstrations would help with abstract concepts", category: "Suggestion", timestamp: "1 day ago" }
   ];
 
-  const handlePromptClick = (prompt) => {
+  const handlePromptClick = (prompt: Prompt) => {
     setSelectedPrompt(prompt);
     // Simulate AI scheduling suggestion
     setTimeout(() => {
-      setSelectedPrompt(prev => ({
+      setSelectedPrompt(prev => prev ? ({
         ...prev,
         aiSuggestion: "AI suggests scheduling a review session on quantum superposition mathematics. Recommended time: Friday 2-3 PM based on student availability patterns."
-      }));
+      }) : null);
     }, 1000);
   };
 
-  const handleFileUpload = (event) => {
-    const files = Array.from(event.target.files);
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
     setUploadedFiles(prev => [...prev, ...files.map(file => ({
       id: Date.now() + Math.random(),
       name: file.name,
