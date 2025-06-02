@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -100,6 +101,13 @@ const Index = () => {
     { icon: Zap, value: "2.5x", label: "Better Retention" }
   ];
 
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById('why-choose-alphamatter');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Navbar />
@@ -133,8 +141,9 @@ const Index = () => {
                 variant="outline" 
                 size="lg"
                 className="border-[#db4d1a] text-[#db4d1a] hover:bg-[#db4d1a] hover:text-white px-8 py-4 text-lg"
+                onClick={scrollToFeatures}
               >
-                Watch Demo
+                Learn More
               </Button>
             </div>
           </motion.div>
@@ -158,7 +167,7 @@ const Index = () => {
       </section>
 
       {/* Core Features Section */}
-      <section className="py-20 px-4 bg-white">
+      <section id="why-choose-alphamatter" className="py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">

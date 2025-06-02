@@ -11,6 +11,7 @@ const Navbar = () => {
   const navItems = [
     { label: 'About Us', href: '/about' },
     { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Pricing', href: '/pricing' },
     { label: 'FAQs', href: '/faqs' }
   ];
 

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-const FAQs = () => {
+const Pricing = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Navbar />
@@ -22,10 +22,10 @@ const FAQs = () => {
               className="h-20 w-20 mx-auto mb-6"
             />
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Frequently Asked Questions
+              Pricing
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Content coming soon. We're preparing answers to common questions for you.
+              Content coming soon. We're preparing detailed pricing information for you.
             </p>
           </motion.div>
         </div>
@@ -36,4 +36,4 @@ const FAQs = () => {
   );
 };
 
-export default FAQs;
+export default Pricing;
