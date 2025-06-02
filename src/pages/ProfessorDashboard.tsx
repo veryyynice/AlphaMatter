@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Upload, MessageSquare, Users, TrendingUp, Clock, BookOpen } from 'lucide-react';
+import { Upload, MessageSquare, Users, TrendingUp, Clock, BookOpen, ArrowLeft, User, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import Sidebar from '@/components/Sidebar';
 
 interface UploadedFile {
@@ -25,6 +27,8 @@ interface Prompt {
 const ProfessorDashboard = () => {
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Mock data for charts
   const engagementData = [
@@ -70,6 +74,14 @@ const ProfessorDashboard = () => {
     }))]);
   };
 
+  const handleLogout = () => {
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
+    navigate('/auth');
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar role="professor" />
@@ -78,12 +90,45 @@ const ProfessorDashboard = () => {
         {/* Header */}
         <header className="bg-white shadow-sm border-b p-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Professor Dashboard</h1>
-            <div className="flex items-center space-x-3">
-              <span className="text-sm text-gray-600">Physics 101 - Quantum Mechanics</span>
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(-1)}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+              <h1 className="text-2xl font-bold text-gray-900">Professor Dashboard</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-600">Physics 101 - Quantum Mechanics</span>
+                <div className="flex items-center space-x-2">
+                  <div className="h-3 w-3 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm text-blue-600">45 Students Online</span>
+                </div>
+              </div>
+              
+              {/* Account Management Widget */}
               <div className="flex items-center space-x-2">
-                <div className="h-3 w-3 bg-blue-500 rounded-full"></div>
-                <span className="text-sm text-blue-600">45 Students Online</span>
+                <Button variant="outline" size="sm" className="text-gray-600 hover:text-[#db4d1a]">
+                  <User className="h-4 w-4 mr-2" />
+                  Account
+                </Button>
+                <Button variant="outline" size="sm" className="text-gray-600 hover:text-[#db4d1a]">
+                  <Settings className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleLogout}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
               </div>
             </div>
           </div>
