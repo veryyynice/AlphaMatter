@@ -1,5 +1,9 @@
 
+import { useNavigate } from 'react-router-dom';
+
 const Footer = () => {
+  const navigate = useNavigate();
+
   return (
     <footer className="bg-gray-900 text-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -21,18 +25,17 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Product</h3>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Demo</a></li>
+              <li><button onClick={() => navigate('/#why-choose-alphamatter')} className="hover:text-white transition-colors text-left">Features</button></li>
+              <li><button onClick={() => navigate('/pricing')} className="hover:text-white transition-colors text-left">Pricing</button></li>
             </ul>
           </div>
           
           <div>
             <h3 className="font-semibold mb-4">Company</h3>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
+              <li><button onClick={() => navigate('/about')} className="hover:text-white transition-colors text-left">About Us</button></li>
+              <li><button onClick={() => navigate('/privacy')} className="hover:text-white transition-colors text-left">Privacy Policy</button></li>
+              <li><button onClick={() => navigate('/faqs')} className="hover:text-white transition-colors text-left">FAQs</button></li>
             </ul>
           </div>
         </div>
