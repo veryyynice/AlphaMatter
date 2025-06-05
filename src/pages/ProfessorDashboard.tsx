@@ -1,13 +1,38 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Upload, MessageSquare, Users, TrendingUp, Clock, BookOpen, ArrowLeft, User, Settings, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import Sidebar from '@/components/Sidebar';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import {
+  Upload,
+  MessageSquare,
+  Users,
+  TrendingUp,
+  Clock,
+  BookOpen,
+  ArrowLeft,
+  User,
+  Settings,
+  LogOut,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import Sidebar from "@/components/Sidebar";
+import supabase from "../../utils/supabase";
 
 interface UploadedFile {
   id: number;
@@ -24,54 +49,100 @@ interface Prompt {
   aiSuggestion?: string;
 }
 
+type StudentQuestionRow = {
+  id: number;
+  question: string;
+  chat_type: string | null;
+  created_at: string;
+  course_id?: string;
+  student_id?: string;
+  answered?: boolean;
+};
+
 const ProfessorDashboard = () => {
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [anonymousPrompts, setAnonymousPrompts] = useState<Prompt[]>([]);
+  const [newPrompt, setNewPrompt] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
   // Mock data for charts
   const engagementData = [
-    { day: 'Mon', questions: 24, participation: 85 },
-    { day: 'Tue', questions: 18, participation: 78 },
-    { day: 'Wed', questions: 32, participation: 92 },
-    { day: 'Thu', questions: 28, participation: 88 },
-    { day: 'Fri', questions: 35, participation: 95 }
+    { day: "Mon", questions: 24, participation: 85 },
+    { day: "Tue", questions: 18, participation: 78 },
+    { day: "Wed", questions: 32, participation: 92 },
+    { day: "Thu", questions: 28, participation: 88 },
+    { day: "Fri", questions: 35, participation: 95 },
   ];
 
   const topicsData = [
-    { name: 'Quantum Mechanics', value: 35, color: '#db4d1a' },
-    { name: 'Wave Functions', value: 25, color: '#ff6b35' },
-    { name: 'Uncertainty Principle', value: 20, color: '#ffa500' },
-    { name: 'Entanglement', value: 20, color: '#ffcc80' }
+    { name: "Quantum Mechanics", value: 35, color: "#db4d1a" },
+    { name: "Wave Functions", value: 25, color: "#ff6b35" },
+    { name: "Uncertainty Principle", value: 20, color: "#ffa500" },
+    { name: "Entanglement", value: 20, color: "#ffcc80" },
   ];
 
-  const anonymousPrompts: Prompt[] = [
-    { id: 1, text: "I'm struggling with the math behind quantum superposition", category: "Academic", timestamp: "2 hours ago" },
-    { id: 2, text: "Could we have more practice problems on wave-particle duality?", category: "Request", timestamp: "3 hours ago" },
-    { id: 3, text: "The pace feels too fast for understanding complex concepts", category: "Feedback", timestamp: "5 hours ago" },
-    { id: 4, text: "More visual demonstrations would help with abstract concepts", category: "Suggestion", timestamp: "1 day ago" }
-  ];
+  // Fetch prompts from Supabase
+  useEffect(() => {
+    const fetchPrompts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("student_questions")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        const prompts = (data as StudentQuestionRow[]).map((item) => ({
+          id: item.id,
+          text: item.question,
+          category: item.chat_type || "General",
+          timestamp: new Date(item.created_at).toLocaleString(),
+          answered: item.answered,
+        }));
+
+        setAnonymousPrompts(prompts);
+      } catch (error) {
+        toast({
+          title: "Error fetching prompts",
+          description:
+            error instanceof Error ? error.message : "Unknown error occurred",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchPrompts();
+  }, [toast]);
 
   const handlePromptClick = (prompt: Prompt) => {
     setSelectedPrompt(prompt);
     // Simulate AI scheduling suggestion
     setTimeout(() => {
-      setSelectedPrompt(prev => prev ? ({
-        ...prev,
-        aiSuggestion: "AI suggests scheduling a review session on quantum superposition mathematics. Recommended time: Friday 2-3 PM based on student availability patterns."
-      }) : null);
+      setSelectedPrompt((prev) =>
+        prev
+          ? {
+              ...prev,
+              aiSuggestion:
+                "AI suggests scheduling a review session on quantum superposition mathematics. Recommended time: Friday 2-3 PM based on student availability patterns.",
+            }
+          : null
+      );
     }, 1000);
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    setUploadedFiles(prev => [...prev, ...files.map(file => ({
-      id: Date.now() + Math.random(),
-      name: file.name,
-      size: file.size,
-      uploadTime: new Date().toLocaleTimeString()
-    }))]);
+    setUploadedFiles((prev) => [
+      ...prev,
+      ...files.map((file) => ({
+        id: Date.now() + Math.random(),
+        name: file.name,
+        size: file.size,
+        uploadTime: new Date().toLocaleTimeString(),
+      })),
+    ]);
   };
 
   const handleLogout = () => {
@@ -79,13 +150,60 @@ const ProfessorDashboard = () => {
       title: "Logged out",
       description: "You have been successfully logged out.",
     });
-    navigate('/auth');
+    navigate("/auth");
+  };
+
+  // Submit new prompt to Supabase
+  const handlePromptSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPrompt.trim()) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("student_questions")
+        .insert([
+          {
+            question: newPrompt,
+            chat_type: "General",
+            answered: false,
+          },
+        ])
+        .select();
+
+      if (error) throw error;
+
+      if (data && data[0]) {
+        setAnonymousPrompts((prev) => [
+          {
+            id: data[0].id,
+            text: data[0].question,
+            category: data[0].chat_type || "General",
+            timestamp: new Date(data[0].created_at).toLocaleString(),
+            answered: data[0].answered,
+          },
+          ...prev,
+        ]);
+
+        setNewPrompt("");
+        toast({
+          title: "Success",
+          description: "Your question has been submitted",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error submitting question",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar role="professor" />
-      
+
       <div className="flex-1 flex flex-col lg:ml-64">
         {/* Header */}
         <header className="bg-white shadow-sm border-b p-4">
@@ -100,29 +218,43 @@ const ProfessorDashboard = () => {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
-              <h1 className="text-2xl font-bold text-gray-900">Professor Dashboard</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Professor Dashboard
+              </h1>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <span className="text-sm text-gray-600">Physics 101 - Quantum Mechanics</span>
+                <span className="text-sm text-gray-600">
+                  Physics 101 - Quantum Mechanics
+                </span>
                 <div className="flex items-center space-x-2">
                   <div className="h-3 w-3 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm text-blue-600">45 Students Online</span>
+                  <span className="text-sm text-blue-600">
+                    45 Students Online
+                  </span>
                 </div>
               </div>
-              
+
               {/* Account Management Widget */}
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" className="text-gray-600 hover:text-[#db4d1a]">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-gray-600 hover:text-[#db4d1a]"
+                >
                   <User className="h-4 w-4 mr-2" />
                   Account
                 </Button>
-                <Button variant="outline" size="sm" className="text-gray-600 hover:text-[#db4d1a]">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-gray-600 hover:text-[#db4d1a]"
+                >
                   <Settings className="h-4 w-4" />
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handleLogout}
                   className="text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
@@ -148,18 +280,24 @@ const ProfessorDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Questions</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Total Questions
+                    </CardTitle>
                     <MessageSquare className="h-4 w-4 text-[#db4d1a]" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">137</div>
-                    <p className="text-xs text-green-600">+12% from last week</p>
+                    <p className="text-xs text-green-600">
+                      +12% from last week
+                    </p>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Average Engagement</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Average Engagement
+                    </CardTitle>
                     <TrendingUp className="h-4 w-4 text-[#db4d1a]" />
                   </CardHeader>
                   <CardContent>
@@ -167,10 +305,12 @@ const ProfessorDashboard = () => {
                     <p className="text-xs text-green-600">+5% from last week</p>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Session Length</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Session Length
+                    </CardTitle>
                     <Clock className="h-4 w-4 text-[#db4d1a]" />
                   </CardHeader>
                   <CardContent>
@@ -234,28 +374,94 @@ const ProfessorDashboard = () => {
                     <CardTitle>Anonymous Student Prompts</CardTitle>
                   </CardHeader>
                   <CardContent>
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="text-sm text-gray-600">
+                        Total Questions: {anonymousPrompts.length}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" className="text-blue-600">
+                          Filter
+                        </Button>
+                        <Button size="sm" variant="outline" className="text-green-600">
+                          Mark All Read
+                        </Button>
+                      </div>
+                    </div>
                     <div className="space-y-3 max-h-96 overflow-y-auto">
                       {anonymousPrompts.map((prompt) => (
                         <motion.div
                           key={prompt.id}
                           whileHover={{ scale: 1.02 }}
                           className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                            selectedPrompt?.id === prompt.id ? 'bg-[#db4d1a]/10 border-[#db4d1a]' : 'hover:bg-gray-50'
+                            selectedPrompt?.id === prompt.id
+                              ? "bg-[#db4d1a]/10 border-[#db4d1a]"
+                              : "hover:bg-gray-50"
                           }`}
                           onClick={() => handlePromptClick(prompt)}
                         >
                           <div className="flex justify-between items-start mb-2">
-                            <span className={`text-xs px-2 py-1 rounded-full ${
-                              prompt.category === 'Academic' ? 'bg-blue-100 text-blue-800' :
-                              prompt.category === 'Request' ? 'bg-green-100 text-green-800' :
-                              prompt.category === 'Feedback' ? 'bg-orange-100 text-orange-800' :
-                              'bg-purple-100 text-purple-800'
-                            }`}>
-                              {prompt.category}
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`text-xs px-2 py-1 rounded-full ${
+                                  prompt.category === "Academic"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : prompt.category === "Request"
+                                    ? "bg-green-100 text-green-800"
+                                    : prompt.category === "Feedback"
+                                    ? "bg-orange-100 text-orange-800"
+                                    : "bg-purple-100 text-purple-800"
+                                }`}
+                              >
+                                {prompt.category}
+                              </span>
+                              {prompt.answered && (
+                                <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">
+                                  Answered
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {prompt.timestamp}
                             </span>
-                            <span className="text-xs text-gray-500">{prompt.timestamp}</span>
                           </div>
-                          <p className="text-sm text-gray-700">{prompt.text}</p>
+                          <p className="text-sm text-gray-700 mb-2">{prompt.text}</p>
+                          <div className="flex justify-between items-center">
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-[#db4d1a] hover:bg-[#db4d1a]/10"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // Handle marking as answered
+                                }}
+                              >
+                                {prompt.answered ? "Mark Unanswered" : "Mark Answered"}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-blue-600"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePromptClick(prompt);
+                                }}
+                              >
+                                Generate Response
+                              </Button>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-gray-500 hover:text-red-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Handle hiding/archiving
+                              }}
+                            >
+                              Archive
+                            </Button>
+                          </div>
                         </motion.div>
                       ))}
                     </div>
@@ -271,7 +477,9 @@ const ProfessorDashboard = () => {
                       <div className="space-y-4">
                         <div className="p-3 bg-gray-50 rounded-lg">
                           <h4 className="font-medium mb-2">Selected Prompt:</h4>
-                          <p className="text-sm text-gray-700">{selectedPrompt.text}</p>
+                          <p className="text-sm text-gray-700">
+                            {selectedPrompt.text}
+                          </p>
                         </div>
                         {selectedPrompt.aiSuggestion ? (
                           <motion.div
@@ -279,10 +487,17 @@ const ProfessorDashboard = () => {
                             animate={{ opacity: 1, y: 0 }}
                             className="p-4 bg-[#db4d1a]/10 border border-[#db4d1a] rounded-lg"
                           >
-                            <h4 className="font-medium text-[#db4d1a] mb-2">AI Recommendation:</h4>
-                            <p className="text-sm text-gray-700 mb-3">{selectedPrompt.aiSuggestion}</p>
+                            <h4 className="font-medium text-[#db4d1a] mb-2">
+                              AI Recommendation:
+                            </h4>
+                            <p className="text-sm text-gray-700 mb-3">
+                              {selectedPrompt.aiSuggestion}
+                            </p>
                             <div className="flex space-x-2">
-                              <Button size="sm" className="bg-[#db4d1a] hover:bg-[#c44217] text-white">
+                              <Button
+                                size="sm"
+                                className="bg-[#db4d1a] hover:bg-[#c44217] text-white"
+                              >
                                 Schedule Session
                               </Button>
                               <Button size="sm" variant="outline">
@@ -293,7 +508,9 @@ const ProfessorDashboard = () => {
                         ) : (
                           <div className="flex items-center justify-center py-8">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#db4d1a]"></div>
-                            <span className="ml-2 text-sm text-gray-600">Analyzing prompt...</span>
+                            <span className="ml-2 text-sm text-gray-600">
+                              Analyzing prompt...
+                            </span>
                           </div>
                         )}
                       </div>
@@ -321,7 +538,9 @@ const ProfessorDashboard = () => {
                   <CardContent>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                       <Upload className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                      <p className="text-gray-600 mb-4">Drag and drop files here, or click to select</p>
+                      <p className="text-gray-600 mb-4">
+                        Drag and drop files here, or click to select
+                      </p>
                       <input
                         type="file"
                         multiple
@@ -355,11 +574,15 @@ const ProfessorDashboard = () => {
                         </div>
                       ) : (
                         uploadedFiles.map((file) => (
-                          <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div
+                            key={file.id}
+                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                          >
                             <div>
                               <p className="text-sm font-medium">{file.name}</p>
                               <p className="text-xs text-gray-500">
-                                {(file.size / 1024).toFixed(1)} KB • {file.uploadTime}
+                                {(file.size / 1024).toFixed(1)} KB •{" "}
+                                {file.uploadTime}
                               </p>
                             </div>
                             <Button size="sm" variant="outline">
@@ -386,30 +609,63 @@ const ProfessorDashboard = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {[
-                      { rating: 5, feedback: "The interactive elements really help me understand complex concepts better.", category: "Positive" },
-                      { rating: 4, feedback: "Would love more practice problems to work through during class.", category: "Suggestion" },
-                      { rating: 3, feedback: "Sometimes the pace is too fast to take proper notes.", category: "Improvement" },
-                      { rating: 5, feedback: "The AI assistance is incredibly helpful for clarifying doubts.", category: "Positive" }
+                      {
+                        rating: 5,
+                        feedback:
+                          "The interactive elements really help me understand complex concepts better.",
+                        category: "Positive",
+                      },
+                      {
+                        rating: 4,
+                        feedback:
+                          "Would love more practice problems to work through during class.",
+                        category: "Suggestion",
+                      },
+                      {
+                        rating: 3,
+                        feedback:
+                          "Sometimes the pace is too fast to take proper notes.",
+                        category: "Improvement",
+                      },
+                      {
+                        rating: 5,
+                        feedback:
+                          "The AI assistance is incredibly helpful for clarifying doubts.",
+                        category: "Positive",
+                      },
                     ].map((item, index) => (
                       <div key={index} className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
                             <div className="flex">
                               {[...Array(5)].map((_, i) => (
-                                <span key={i} className={`text-lg ${i < item.rating ? 'text-yellow-400' : 'text-gray-300'}`}>
+                                <span
+                                  key={i}
+                                  className={`text-lg ${
+                                    i < item.rating
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                >
                                   ★
                                 </span>
                               ))}
                             </div>
-                            <span className={`text-xs px-2 py-1 rounded-full ${
-                              item.category === 'Positive' ? 'bg-green-100 text-green-800' :
-                              item.category === 'Suggestion' ? 'bg-blue-100 text-blue-800' :
-                              'bg-orange-100 text-orange-800'
-                            }`}>
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                item.category === "Positive"
+                                  ? "bg-green-100 text-green-800"
+                                  : item.category === "Suggestion"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-orange-100 text-orange-800"
+                              }`}
+                            >
                               {item.category}
                             </span>
                           </div>
-                          <span className="text-xs text-gray-500">Anonymous</span>
+                          <span className="text-xs text-gray-500">
+                            Anonymous
+                          </span>
                         </div>
                         <p className="text-sm text-gray-700">{item.feedback}</p>
                       </div>

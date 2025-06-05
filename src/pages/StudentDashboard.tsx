@@ -8,19 +8,36 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import Sidebar from '@/components/Sidebar';
+import supabase from '../../utils/supabase';
+
+interface ChatMessage {
+  id: number;
+  text: string;
+  sender: 'student' | 'ai';
+  timestamp: string;
+  date?: string;
+}
+
+interface ChatHistory {
+  general: ChatMessage[];
+  private: ChatMessage[];
+}
 
 const StudentDashboard = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [transcriptText, setTranscriptText] = useState('');
-  const [chatMessages, setChatMessages] = useState([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
   const [showChatHistory, setShowChatHistory] = useState(false);
+  const [courseId, setCourseId] = useState('PHYS101'); // Default to Physics 101
+  const [studentId, setStudentId] = useState('STUDENT_001'); // TODO: Replace with actual student ID from auth
   const navigate = useNavigate();
   const { toast } = useToast();
 
   // Mock chat history data
-  const chatHistory = {
+  const chatHistory: ChatHistory = {
     general: [
       { id: 1, text: "What is quantum entanglement?", sender: 'student', timestamp: '10:30 AM', date: '2024-01-15' },
       { id: 2, text: "Quantum entanglement is a phenomenon where particles become interconnected...", sender: 'ai', timestamp: '10:31 AM', date: '2024-01-15' },
@@ -65,20 +82,71 @@ const StudentDashboard = () => {
     "What are the practical applications of quantum computing?"
   ];
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      const message = {
-        id: Date.now(),
-        text: newMessage,
-        sender: 'student',
-        timestamp: new Date().toLocaleTimeString()
-      };
-      setChatMessages(prev => [...prev, message]);
-      setNewMessage('');
-      
-      // Simulate AI response
+  const submitQuestionToSupabase = async (
+    question: string,
+    chatType: 'private' | 'general',
+    courseId: string,
+    studentId: string
+  ) => {
+    try {
+      setIsSubmitting(true);
+      const { data, error } = await supabase
+        .from('student_questions')
+        .insert([
+          {
+            question,
+            chat_type: chatType,
+            course_id: courseId,
+            student_id: studentId,
+            answered: false,
+            created_at: new Date().toISOString()
+          }
+        ])
+        .select();
+
+      if (error) throw error;
+
+      if (data && data[0]) {
+        toast({
+          title: "Success",
+          description: chatType === 'private' 
+            ? "Private note saved successfully" 
+            : "Question submitted successfully",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error submitting question",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || isSubmitting) return;
+
+    const message: ChatMessage = {
+      id: Date.now(),
+      text: newMessage,
+      sender: 'student',
+      timestamp: new Date().toLocaleTimeString()
+    };
+
+    // Add message to local state
+    setChatMessages(prev => [...prev, message]);
+    
+    // Submit to Supabase
+    await submitQuestionToSupabase(newMessage, activeTab as 'private' | 'general', courseId, studentId);
+    
+    setNewMessage('');
+    
+    // Simulate AI response only for general chat
+    if (activeTab === 'general') {
       setTimeout(() => {
-        const aiResponse = {
+        const aiResponse: ChatMessage = {
           id: Date.now() + 1,
           text: "That's a great question! Let me help you understand this concept better...",
           sender: 'ai',
@@ -308,8 +376,13 @@ const StudentDashboard = () => {
                       size="sm" 
                       onClick={handleSendMessage}
                       className="bg-[#db4d1a] hover:bg-[#c44217] text-white"
+                      disabled={isSubmitting || !newMessage.trim()}
                     >
-                      <Send className="h-4 w-4" />
+                      {isSubmitting ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 )}
