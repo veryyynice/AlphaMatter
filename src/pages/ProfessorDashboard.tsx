@@ -379,10 +379,18 @@ const ProfessorDashboard = () => {
                         Total Questions: {anonymousPrompts.length}
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="text-blue-600">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-blue-600"
+                        >
                           Filter
                         </Button>
-                        <Button size="sm" variant="outline" className="text-green-600">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-green-600"
+                        >
                           Mark All Read
                         </Button>
                       </div>
@@ -424,7 +432,9 @@ const ProfessorDashboard = () => {
                               {prompt.timestamp}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-700 mb-2">{prompt.text}</p>
+                          <p className="text-sm text-gray-700 mb-2">
+                            {prompt.text}
+                          </p>
                           <div className="flex justify-between items-center">
                             <div className="flex gap-2">
                               <Button
@@ -436,18 +446,9 @@ const ProfessorDashboard = () => {
                                   // Handle marking as answered
                                 }}
                               >
-                                {prompt.answered ? "Mark Unanswered" : "Mark Answered"}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-blue-600"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePromptClick(prompt);
-                                }}
-                              >
-                                Generate Response
+                                {prompt.answered
+                                  ? "Mark Unanswered"
+                                  : "Mark Answered"}
                               </Button>
                             </div>
                             <Button
