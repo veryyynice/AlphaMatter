@@ -1,18 +1,17 @@
-
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   const navItems = [
-    { label: 'About Us', href: '/about' },
-    { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'Pricing', href: '/pricing' },
-    { label: 'FAQs', href: '/faqs' }
+    { label: "About Us", href: "/about" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Pricing", href: "/pricing" },
+    { label: "FAQs", href: "/faqs" },
   ];
 
   const handleNavigation = (href: string) => {
@@ -25,13 +24,18 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
-            <img 
-              src="/lovable-uploads/ee34ecb0-98ab-4495-a2f7-0445311ee258.png" 
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            <img
+              src="/AlphaMatter/lovable-uploads/ee34ecb0-98ab-4495-a2f7-0445311ee258.png"
               alt="AlphaMatter"
               className="h-10 w-10 mr-3"
             />
-            <span className="text-2xl font-bold text-gray-900">AlphaMatter</span>
+            <span className="text-2xl font-bold text-gray-900">
+              AlphaMatter
+            </span>
           </div>
 
           {/* Desktop Navigation */}
@@ -45,10 +49,10 @@ const Navbar = () => {
                 {item.label}
               </button>
             ))}
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="border-[#db4d1a] text-[#db4d1a] hover:bg-[#db4d1a] hover:text-white"
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate("/auth")}
             >
               Sign In
             </Button>
@@ -61,7 +65,11 @@ const Navbar = () => {
               size="sm"
               onClick={() => setIsOpen(!isOpen)}
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </Button>
           </div>
         </div>
@@ -81,9 +89,9 @@ const Navbar = () => {
               </button>
             ))}
             <div className="px-3 py-2">
-              <Button 
+              <Button
                 className="w-full bg-[#db4d1a] hover:bg-[#c44217] text-white"
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate("/auth")}
               >
                 Sign In
               </Button>

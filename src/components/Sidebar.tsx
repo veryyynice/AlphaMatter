@@ -71,7 +71,7 @@ const Sidebar = ({ role = 'student' }) => {
           {!isCollapsed && (
             <div className="flex items-center">
               <img 
-                src="/lovable-uploads/ee34ecb0-98ab-4495-a2f7-0445311ee258.png" 
+                src="/AlphaMatter/lovable-uploads/ee34ecb0-98ab-4495-a2f7-0445311ee258.png" 
                 alt="AlphaMatter"
                 className="h-8 w-8 mr-3"
               />

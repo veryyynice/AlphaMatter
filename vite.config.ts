@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  base: "/AlphaMatter",
+  base: "/AlphaMatter/",
   plugins: [react(), mode === "development" && componentTagger()].filter(
     Boolean
   ),
